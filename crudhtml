@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD Livraria</title>
+  <link rel="stylesheet" href="crud.css">
+</head>
+<body>
+  <h1>📚 CRUD Livraria</h1>
+
+  <!-- Formulário -->
+  <form id="livroForm">
+    <input type="hidden" id="ID">
+    <input type="text" id="titulo" placeholder="Título" required>
+    <input type="text" id="autor" placeholder="Autor" required>
+    <input type="number" id="ano" placeholder="Ano de Publicação" required>
+    <input type="text" id="genero" placeholder="Gênero" required>
+    <input type="text" id="idioma" placeholder="Idioma" required>
+    <input type="number" step="0.01" id="preco" placeholder="Preço" required>
+    <button type="submit">Salvar</button>
+  </form>
+
+  <!-- Tabela -->
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>Ano</th>
+        <th>Gênero</th>
+        <th>Idioma</th>
+        <th>Preço</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="listaLivros"></tbody>
+  </table>
+
+  <!-- Exibir Livro -->
+  <div id="detalhesLivro" class="detalhes">
+    <h3>📖 Detalhes do Livro</h3>
+    <p id="infoLivro"></p>
+    <button onclick="fecharDetalhes()">Fechar</button>
+  </div>
+
+  <!-- JavaScript dentro do HTML -->
+  <script>
+    let livros = [];
+    let idCounter = 1;
+
+    const form = document.getElementById("livroForm");
+    const listaLivros = document.getElementById("listaLivros");
+    const livroId = document.getElementById("ID");
+
+    form.onsubmit = function(e) {
+      e.preventDefault();
+
+      let titulo = document.getElementById("titulo").value;
+      let autor = document.getElementById("autor").value;
+      let ano = document.getElementById("ano").value;
+      let genero = document.getElementById("genero").value;
+      let idioma = document.getElementById("idioma").value;
+      let preco = document.getElementById("preco").value;
+
+      if (livroId.value) {
+        let livro = livros.find(l => l.id == livroId.value);
+        livro.titulo = titulo;
+        livro.autor = autor;
+        livro.ano = ano;
+        livro.genero = genero;
+        livro.idioma = idioma;
+        livro.preco = preco;
+      } else {
+        let novoLivro = {
+          id: idCounter++,
+          titulo,
+          autor,
+          ano,
+          genero,
+          idioma,
+          preco
+        };
+        livros.push(novoLivro);
+      }
+
+      form.reset();
+      livroId.value = "";
+      renderLivros();
+    }
+
+    function renderLivros() {
+      listaLivros.innerHTML = "";
+      livros.forEach(l => {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${l.id}</td>
+          <td>${l.titulo}</td>
+          <td>${l.autor}</td>
+          <td>${l.ano}</td>
+          <td>${l.genero}</td>
+          <td>${l.idioma}</td>
+          <td>R$ ${l.preco}</td>
+          <td>
+            <button onclick="verLivro(${l.id})">Ver</button>
+            <button onclick="editarLivro(${l.id})">Editar</button>
+            <button onclick="excluirLivro(${l.id})">Excluir</button>
+          </td>
+        `;
+        listaLivros.appendChild(tr);
+      });
+    }
+
+    function verLivro(id) {
+      let livro = livros.find(l => l.id == id);
+      document.getElementById("infoLivro").innerText =
+        `ID: ${livro.id}\nTítulo: ${livro.titulo}\nAutor: ${livro.autor}\nAno: ${livro.ano}\nGênero: ${livro.genero}\nIdioma: ${livro.idioma}\nPreço: R$ ${livro.preco}`;
+      document.getElementById("detalhesLivro").style.display = "block";
+    }
+
+    function fecharDetalhes() {
+      document.getElementById("detalhesLivro").style.display = "none";
+    }
+
+    function editarLivro(id) {
+      let livro = livros.find(l => l.id == id);
+      livroId.value = livro.id;
+      document.getElementById("titulo").value = livro.titulo;
+      document.getElementById("autor").value = livro.autor;
+      document.getElementById("ano").value = livro.ano;
+      document.getElementById("genero").value = livro.genero;
+      document.getElementById("idioma").value = livro.idioma;
+      document.getElementById("preco").value = livro.preco;
+    }
+
+    function excluirLivro(id) {
+      livros = livros.filter(l => l.id != id);
+      renderLivros();
+    }
+  </script>
+</body>
+</html>
